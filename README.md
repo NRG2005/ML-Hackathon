@@ -1,84 +1,96 @@
-🤖 Hybrid ML Hangman AI Solver
-This project is a high-performance Hangman solver built for the (Hackathon Name). It uses a unique hybrid model that combines traditional N-gram and frequency-based models with a Deep Q-Network (DQN) for reinforcement learning.
+# 🤖 Hybrid ML Hangman AI Solver
+
+This project is a high-performance Hangman solver built for competitive AI challenges. It uses a unique hybrid model that combines traditional N-gram and frequency-based models with a Deep Q-Network (DQN) for reinforcement learning.
 
 The project includes an interactive Streamlit web app to visualize the AI's decision-making process in real-time, showing the letter probabilities calculated by each of its "brain" components.
 
-🎥 Demo
-(You should record a quick GIF of the Streamlit app in action and save it as demo.gif in this folder)
+## 🎥 Demo
 
-✨ Features
-Hybrid Reasoning Engine: The AI doesn't rely on one strategy. It blends three heuristic models:
+> **Note:** Record a quick GIF of the Streamlit app in action and save it as `demo.gif` in this folder, then add it here:
+> ```markdown
+> ![Demo](demo.gif)
+> ```
 
-FastPatternMatcher: Filters a 50,000-word corpus against the current pattern (e.g., _ _ A _ _).
+## ✨ Features
 
-FastNGramModel: Uses unigram, bigram, and trigram statistics to predict the most likely letter in a blank.
+### Hybrid Reasoning Engine
+The AI doesn't rely on one strategy. It blends three heuristic models:
 
-FastFrequencyModel: Uses global and length-specific letter frequencies as a baseline.
+- **FastPatternMatcher**: Filters a 50,000-word corpus against the current pattern (e.g., `_ _ A _ _`)
+- **FastNGramModel**: Uses unigram, bigram, and trigram statistics to predict the most likely letter in a blank
+- **FastFrequencyModel**: Uses global and length-specific letter frequencies as a baseline
 
-Reinforcement Learning (DQN): A MicroDQN (a tiny deep Q-network) acts as a "meta-learner." It learns from its mistakes and successes to decide the optimal blend of the heuristic models at any given game state.
+### Reinforcement Learning (DQN)
+A MicroDQN (a tiny deep Q-network) acts as a "meta-learner." It learns from its mistakes and successes to decide the optimal blend of the heuristic models at any given game state.
 
-Interactive Frontend: A simple and "cool" Streamlit (app.py) app that lets you:
+### Interactive Frontend
+A simple and elegant Streamlit (`app.py`) app that lets you:
 
-Enter any secret word.
+- Enter any secret word
+- Watch the AI play the game step-by-step
+- **Visualize the AI's "Brain"**: A live bar chart shows the probabilities each model assigns to available letters, so you can see why the AI chose 'E' over 'T'
 
-Watch the AI play the game step-by-step.
+## 🚀 How to Run
 
-Visualize the AI's "Brain": A live bar chart shows the probabilities each model assigns to available letters, so you can see why the AI chose 'E' over 'T'.
+### Prerequisites
 
-🚀 How to Run
-1. Prerequisites
-Python 3.8+
+- Python 3.8+
+- A `data` folder containing `corpus.txt` and `test_corpus.txt`
 
-A data folder containing corpus.txt and test_corpus.txt.
+### Setup
 
-2. Setup
-Clone the repository:
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/your-username/your-repo-name.git
+   cd your-repo-name
+   ```
 
-Bash
+2. **Create and activate a virtual environment** (Recommended):
 
-git clone https://github.com/your-username/your-repo-name.git
-cd your-repo-name
-Create and activate a virtual environment (Recommended):
+   **For Unix/macOS:**
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
 
-Bash
+   **For Windows:**
+   ```bash
+   python -m venv venv
+   .\venv\Scripts\activate
+   ```
 
-# For Unix/macOS
-python3 -m venv venv
-source venv/bin/activate
+3. **Install the required libraries:**
+   ```bash
+   pip install torch numpy streamlit pandas tqdm
+   ```
 
-# For Windows
-python -m venv venv
-.\venv\Scripts\activate
-Install the required libraries:
+### Step 1: Train the AI Model
 
-Bash
+You must run the training script once to generate the N-gram models and the trained DQN agent file (`final_agent.pkl`).
 
-pip install torch numpy streamlit pandas tqdm
-3. Step 1: Train the AI Model
-You must run the training script once to generate the N-gram models and the trained DQN agent file (final_agent.pkl).
-
-Bash
-
+```bash
 python hangman_ai.py
+```
+
 This will:
+- Load the `data/corpus.txt`
+- Train the Pattern, N-Gram, and Frequency models
+- Run 10,000 episodes of RL training to create `final_agent.pkl`
+- Run a final test using `data/test_corpus.txt`
 
-Load the data/corpus.txt.
+### Step 2: Run the Streamlit Web App
 
-Train the Pattern, N-Gram, and Frequency models.
+Once `final_agent.pkl` exists, you can start the frontend:
 
-Run 10,000 episodes of RL training to create final_agent.pkl.
-
-Run a final test using data/test_corpus.txt.
-
-4. Step 2: Run the Streamlit Web App
-Once final_agent.pkl exists, you can start the frontend:
-
-Bash
-
+```bash
 streamlit run app.py
-Your web browser will automatically open to http://localhost:8501.
+```
 
-📂 Project Structure
+Your web browser will automatically open to `http://localhost:8501`.
+
+## 📂 Project Structure
+
+```
 hangman-ai-solver/
 │
 ├── data/
@@ -89,29 +101,52 @@ hangman-ai-solver/
 ├── app.py                 # The Streamlit frontend
 ├── final_agent.pkl        # (Generated after running hangman_ai.py)
 └── README.md              # This file
-🧠 Model Architecture
-The core of this AI is in the FastAgent's get_action method. It dynamically blends the outputs of its models based on the game's progress.
+```
 
-Heuristic Models:
+## 🧠 Model Architecture
 
-FastPatternMatcher: This is the most powerful model. It filters the entire word list (candidates) to find words that could match the current pattern (e.g., _ P P _ E) and have no "wrong" letters. It then counts the frequency of letters appearing in the blank spots of these matching words.
+The core of this AI is in the `FastAgent`'s `get_action` method. It dynamically blends the outputs of its models based on the game's progress.
 
-FastNGramModel: This model is excellent at the start of the game when the pattern model has too many candidates. It looks at the letters around a blank (e.g., ^__ or T _ E) and uses pre-computed N-gram (1, 2, and 3-letter) probabilities to guess what should go in the middle.
+### Heuristic Models
 
-FastFrequencyModel: A simple baseline that uses global letter frequency ('E' is most common) and frequency based on word length.
+- **FastPatternMatcher**: This is the most powerful model. It filters the entire word list (candidates) to find words that could match the current pattern (e.g., `_ P P _ E`) and have no "wrong" letters. It then counts the frequency of letters appearing in the blank spots of these matching words.
 
-Reinforcement Learning (DQN):
+- **FastNGramModel**: This model is excellent at the start of the game when the pattern model has too many candidates. It looks at the letters around a blank (e.g., `^__` or `T _ E`) and uses pre-computed N-gram (1, 2, and 3-letter) probabilities to guess what should go in the middle.
 
-A MicroDQN (a tiny 1-hidden-layer neural net) is trained to predict the Q-value (expected future reward) of guessing any given letter.
+- **FastFrequencyModel**: A simple baseline that uses global letter frequency ('E' is most common) and frequency based on word length.
 
-The state given to the DQN is a 35-dimension vector describing the game (e.g., number of wrong guesses, ratio of blanks, vowel-to-consonant ratio, etc.).
+### Reinforcement Learning (DQN)
 
-The reward function heavily penalizes wrong guesses (-2.5) and repeated guesses (-8.0), and gives large bonuses for correct guesses (+4.0) and winning (+25.0).
+- A **MicroDQN** (a tiny 1-hidden-layer neural net) is trained to predict the Q-value (expected future reward) of guessing any given letter.
 
-The Hybrid Blend: The agent combines these models using dynamic weights.
+- The **state** given to the DQN is a 35-dimension vector describing the game (e.g., number of wrong guesses, ratio of blanks, vowel-to-consonant ratio, etc.).
 
-When many blanks are left (blanks_ratio > 0.6), it trusts the N-Gram and Frequency models more.
+- The **reward function** heavily penalizes wrong guesses (-2.5) and repeated guesses (-8.0), and gives large bonuses for correct guesses (+4.0) and winning (+25.0).
 
-When few blanks are left, it trusts the FastPatternMatcher almost exclusively, as the list of candidate words becomes very small and accurate.
+### The Hybrid Blend
 
-The RL model's Q-values are normalized and added as a small, final weight, acting as a "policy polisher" to break ties and nudge the agent away from moves that seem good but have historically led to losses.
+The agent combines these models using dynamic weights:
+
+- When many blanks are left (`blanks_ratio > 0.6`), it trusts the N-Gram and Frequency models more
+- When few blanks are left, it trusts the FastPatternMatcher almost exclusively, as the list of candidate words becomes very small and accurate
+- The RL model's Q-values are normalized and added as a small, final weight, acting as a "policy polisher" to break ties and nudge the agent away from moves that seem good but have historically led to losses
+
+## 📊 Performance
+
+*Add your performance metrics here after testing, e.g.:*
+- Win rate: XX%
+- Average wrong guesses per game: X.X
+- Words tested: XXX
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🙏 Acknowledgments
+
+- Thanks to the hackathon organizers and my team for making this possible.
+- Built with PyTorch, Streamlit, and lots of ☕
