@@ -1,4 +1,5 @@
 Hybrid ML Hangman AI Solver
+
 This project is a high-performance Hangman solver built for the (Hackathon Name). It uses a unique hybrid model that combines traditional N-gram and frequency-based models with a Deep Q-Network (DQN) for reinforcement learning.
 The project includes an interactive Streamlit web app to visualize the AI's decision-making process in real-time, showing the letter probabilities calculated by each of its "brain" components.
 
